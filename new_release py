@@ -1,0 +1,72 @@
+from CherwellAPI import CherwellClient
+from jira import JIRA
+
+# Function to fetch data from Jira
+def get_data_from_jira(issue_key, jira_url, jira_username, jira_password):
+    jira_options = {'server': jira_url}
+    jira_client = JIRA(options=jira_options, basic_auth=(jira_username, jira_password))
+
+    try:
+        issue = jira_client.issue(issue_key)
+        return {
+            'RequestGroup': issue.fields.customfield_10000 if hasattr(issue.fields, 'customfield_10000') else '',
+            'ReleaseType': issue.fields.customfield_10001 if hasattr(issue.fields, 'customfield_10001') else '',
+            'Build': issue.fields.customfield_10002 if hasattr(issue.fields, 'customfield_10002') else '',
+            'Urgency': issue.fields.customfield_10003 if hasattr(issue.fields, 'customfield_10003') else ''
+        }
+    except Exception as e:
+        print(f"Failed to fetch data from Jira. An error occurred: {e}")
+        return {}
+
+# Replace these with your Cherwell API details
+cherwell_url = "https://your-cherwell-instance"
+api_key = "your_api_key"  # If your Cherwell instance requires an API key
+username = "your_username"
+password = "your_password"
+
+# Replace these with your Jira details
+jira_url = "your_jira_url"
+jira_username = "your_jira_username"
+jira_password = "your_jira_password"
+
+# Create a new CherwellClient Connection
+cherwell_client = CherwellClient.Connection(cherwell_url, api_key, username, password)
+
+# Create a new instance of a Release business object
+release = cherwell_client.get_new_business_object("Release")
+
+# Fetch data from Jira
+jira_issue_key = "JIRA-123"  # Replace with the actual Jira issue key
+jira_data = get_data_from_jira(jira_issue_key, jira_url, jira_username, jira_password)
+
+# Define the properties for the new Release
+release_properties = {
+    "ShortDescription": "Mobile deployment prod",
+    "Requestor": "Nagisetti, Sheela (P4567)",
+    "RequestGroup": jira_data.get('RequestGroup', ''),
+    "Program": "Mobile 2.0",
+    "Environment": "prod",
+    "PrimaryApplicationCI": "MOBILE 2.0 Back office",
+    "ReleaseType": jira_data.get('ReleaseType', ''),
+    "TypeOfTesting": "Sanity and Smoke Test",
+    "CurrentPlannedStartDate": "2023-12-20",
+    "DeploymentDescriptionSummary": "Defect Fixes",
+    "Build": jira_data.get('Build', ''),
+    "Urgency": jira_data.get('Urgency', ''),
+    "UrgencyReason": "Prod Deployment",
+    "ServiceImpact": "Yes - Continuous",
+    "ImpactToOrderInProgress": "Yes"
+}
+
+# Set the properties of the new Release
+for key, value in release_properties.items():
+    setattr(release, key, value)
+
+# Save the new Release
+try:
+    release.Save()
+    # Retrieve and print the ID of the newly created release
+    new_release_id = release.busObRecId  # Assuming busObRecId is the correct attribute, adjust if needed
+    print(f"New release created successfully! Release ID: {new_release_id}")
+except Exception as e:
+    print(f"Failed to create release. An error occurred: {e}")
