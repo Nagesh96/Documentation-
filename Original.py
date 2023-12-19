@@ -30,15 +30,17 @@ priority = issue.fields.priority.name
 release_manager = issue.fields.customfield_12345
 release_type = issue.fields.customfield_67890
 
-# Update Cherwell fields
-cherwell_new_release = cherwell_client.get_new_business_object(cherwell_object_type)
+# Create a new Cherwell business object
+cherwell_new_release = cherwell_client.create_new_business_object(cherwell_object_type)
+
+# Set Cherwell field values with Jira details
 cherwell_new_release.Description = description
 cherwell_new_release.Environment = environment
 cherwell_new_release.Priority = priority
 cherwell_new_release.ReleaseManager = release_manager  # Assuming ReleaseManager is a field in Cherwell
 cherwell_new_release.ReleaseType = release_type  # Assuming ReleaseType is a field in Cherwell
 
-# Save the updated Cherwell new release
+# Save the new Cherwell business object
 response = cherwell_client.save_object(cherwell_new_release)
 
 # Check for success
@@ -47,4 +49,4 @@ if response['status'] == 'Success':
     print(f"RecId for new Release: {cherwell_new_release.busObRecId}")
     print('Cherwell update successful')
 else:
-    print(f'Cherwell update failed. Error: {response["errorMessage"]}')￼Enter
+    print(f'Cherwell update failed. Error: {response["errorMessage"]}')
