@@ -68,4 +68,4 @@ Step 3: Save Release in Cherwell
   - Utilize logging mechanisms to capture script execution details.
 Conclusion
 -----------
-This design documentation outlines the prerequisites, workflow, implementation details, and testing approach for integrating Jira with Cherwell. Please customize the details based on your specific requirements and environment.￼Enter
+This design documentation outlines the prerequisites, workflow, implementation details, and testing approach for integrating Jira with Cherwell. Please customize the details based on your specific requirements and environment.
